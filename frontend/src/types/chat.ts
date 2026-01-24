@@ -1,4 +1,6 @@
 // Chat-related types
+import type { RAGSource } from './rag';
+
 export type MessageRole = 'user' | 'assistant' | 'system';
 
 export type MessageStatus = 'sending' | 'sent' | 'error' | 'streaming';

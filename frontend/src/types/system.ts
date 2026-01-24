@@ -223,6 +223,12 @@ export interface AppError {
   suggestion?: string;
 }
 
+export interface ApiError {
+  message: string;
+  code?: string;
+  details?: any;
+}
+
 export type ErrorCode =
   | 'MODEL_LOAD_FAILED'
   | 'MODEL_INFERENCE_FAILED'

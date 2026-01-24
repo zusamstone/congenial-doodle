@@ -2,7 +2,7 @@ import { cn } from '@/utils/helpers';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
   children: React.ReactNode;
 }
 
@@ -28,6 +28,7 @@ export function Button({
           'h-8 px-3 text-sm': size === 'sm',
           'h-10 px-4': size === 'md',
           'h-12 px-6 text-lg': size === 'lg',
+          'h-10 w-10': size === 'icon',
         },
         className
       )}
