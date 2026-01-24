@@ -5,7 +5,7 @@ Provides token counting for various models using tiktoken.
 """
 
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 try:
     import tiktoken

@@ -6,7 +6,6 @@ Handles embedding storage, indexing, and retrieval using ChromaDB.
 
 import logging
 from typing import List, Dict, Optional, Any
-from pathlib import Path
 
 try:
     import chromadb
@@ -58,7 +57,10 @@ class VectorStore:
 
         Args:
             collection_name: Name of the ChromaDB collection
-            embedding_model: Embedding model to use (default from settings)
+            embedding_model: Embedding model to use (default from settings).
+                Note: This is stored as metadata only. ChromaDB uses its default
+                embedding function unless explicitly configured with a custom
+                embedding_function parameter.
         """
         if chromadb is None:
             raise ImportError(
