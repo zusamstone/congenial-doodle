@@ -45,6 +45,7 @@ export const useModels = (): UseModelsReturn => {
 
   useEffect(() => {
     fetchModels();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadModel = useCallback(async (modelId: string, options?: ModelLoadOptions) => {

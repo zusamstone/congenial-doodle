@@ -103,7 +103,7 @@ export const useChat = (options: UseChatOptions = {}): UseChatReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [options.modelId, options.systemPromptId]);
+  }, [options.modelId, options.systemPromptId, sendMessageInternal]);
 
   // Internal function to send a message (used by both sendMessage and createNewChat)
   const sendMessageInternal = useCallback(async (content: string, chat: Chat) => {

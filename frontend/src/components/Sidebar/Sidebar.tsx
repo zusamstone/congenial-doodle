@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, MessageSquare, Search, Trash2, Pin, Archive } from 'lucide-react';
 import { useChatList } from '@/hooks';
-import { Button } from '@/components/ui';
+import { Button, ConfirmDialog } from '@/components/ui';
 import { cn } from '@/utils/helpers';
 import type { Chat } from '@/types/chat';
 
@@ -19,6 +19,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { chats, isLoading, createChat, deleteChat, updateChat } = useChatList();
   const [searchQuery, setSearchQuery] = useState('');
   const [showArchived, setShowArchived] = useState(false);
+  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
 
   const handleNewChat = async () => {
     const newChat = await createChat();
@@ -30,11 +31,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleDeleteChat = async (chatId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this chat?')) {
-      await deleteChat(chatId);
-      if (currentChatId === chatId) {
+    setChatToDelete(chatId);
+  };
+
+  const confirmDelete = async () => {
+    if (chatToDelete) {
+      await deleteChat(chatToDelete);
+      if (currentChatId === chatToDelete) {
         onNewChat();
       }
+      setChatToDelete(null);
     }
   };
 
@@ -147,6 +153,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={chatToDelete !== null}
+        title="Delete Chat"
+        message="Are you sure you want to delete this chat? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setChatToDelete(null)}
+      />
     </div>
   );
 };
@@ -188,16 +206,18 @@ const ChatItem: React.FC<ChatItemProps> = ({
   };
 
   return (
-    <div
+    <button
       onClick={onSelect}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
       className={cn(
-        'group relative px-3 py-2 mx-2 rounded-lg cursor-pointer transition-colors',
+        'group relative px-3 py-2 mx-2 rounded-lg cursor-pointer transition-colors w-full text-left',
         isActive
           ? 'bg-blue-600 text-white'
           : 'text-gray-300 hover:bg-gray-700'
       )}
+      aria-label={`Select chat: ${chat.title}`}
+      aria-current={isActive ? 'page' : undefined}
     >
       <div className="flex items-start gap-2">
         {/* Chat Icon */}
@@ -258,6 +278,6 @@ const ChatItem: React.FC<ChatItemProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </button>
   );
 };
