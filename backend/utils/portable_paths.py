@@ -2,6 +2,7 @@
 Portable paths management
 Handles path resolution for portable application
 """
+import sys
 from pathlib import Path
 
 from loguru import logger
@@ -151,7 +152,3 @@ def is_portable_mode() -> bool:
     """
     # If DATA_DIR is relative, we're in portable mode
     return not Path(settings.DATA_DIR).is_absolute()
-
-
-# Import sys for frozen check
-import sys

@@ -3,6 +3,7 @@ Configuration management
 Loads settings from environment variables and config files
 """
 from pathlib import Path
+from typing import Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from loguru import logger
