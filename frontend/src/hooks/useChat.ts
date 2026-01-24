@@ -139,10 +139,9 @@ export const useChat = (options: UseChatOptions = {}): UseChatReturn => {
 
     try {
       // Connect to WebSocket for streaming
-      const wsUrl =
-        typeof window !== 'undefined'
-          ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/chat/ws`
-          : `ws://localhost:8000/api/chat/ws`;
+      const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws';
+      const host = typeof window !== 'undefined' ? window.location.host : 'localhost:8000';
+      const wsUrl = `${protocol}://${host}/api/chat/ws`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 

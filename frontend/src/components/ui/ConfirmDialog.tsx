@@ -30,8 +30,10 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   };
 
   React.useEffect(() => {
+    if (!isOpen) return;
+
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape') {
         onCancel();
       }
     };
