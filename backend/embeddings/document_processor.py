@@ -17,7 +17,7 @@ import mimetypes
 
 # Import document processing libraries
 try:
-    import pypdf2 as pypdf
+    import pypdf
 except ImportError:
     pypdf = None
 
