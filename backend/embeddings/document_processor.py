@@ -12,7 +12,7 @@ Handles extraction of text from various document formats:
 
 import logging
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import mimetypes
 
 # Import document processing libraries

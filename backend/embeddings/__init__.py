@@ -11,7 +11,7 @@ This module handles:
 
 from .vector_store import VectorStore
 from .document_processor import DocumentProcessor
-from .chunking import ChunkingStrategy, FixedSizeChunking, SemanticChunking
+from .chunking import ChunkingStrategy, FixedSizeChunking, SemanticChunking, RecursiveChunking
 
 __all__ = [
     "VectorStore",
@@ -19,4 +19,5 @@ __all__ = [
     "ChunkingStrategy",
     "FixedSizeChunking",
     "SemanticChunking",
+    "RecursiveChunking",
 ]

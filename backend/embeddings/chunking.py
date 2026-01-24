@@ -99,14 +99,21 @@ class FixedSizeChunking:
                     # Found separator, split there
                     end = last_sep + len(self.separator)
 
-            # Extract chunk text
-            chunk_text = text[start:end].strip()
+            # Extract chunk text and adjust positions to match stripped content
+            raw_chunk = text[start:end]
+            chunk_text = raw_chunk.strip()
 
             if chunk_text:
+                # Calculate leading and trailing whitespace removed by strip()
+                leading_ws = len(raw_chunk) - len(raw_chunk.lstrip())
+                trailing_ws = len(raw_chunk) - len(raw_chunk.rstrip())
+                adjusted_start = start + leading_ws
+                adjusted_end = end - trailing_ws
+
                 chunk = Chunk(
                     text=chunk_text,
-                    start_char=start,
-                    end_char=end,
+                    start_char=adjusted_start,
+                    end_char=adjusted_end,
                     metadata={
                         **metadata,
                         "chunk_index": len(chunks),
@@ -172,9 +179,14 @@ class SemanticChunking:
         current_chunk = []
         current_size = 0
         current_start = 0
+        last_end = 0
 
         for sentence, start, end in sentences:
             sentence_len = len(sentence)
+
+            # Track start of first sentence in chunk
+            if not current_chunk:
+                current_start = start
 
             # Check if adding this sentence would exceed max_size
             if current_size + sentence_len > self.max_size and current_chunk:
@@ -184,7 +196,7 @@ class SemanticChunking:
                     chunk = Chunk(
                         text=chunk_text,
                         start_char=current_start,
-                        end_char=start,
+                        end_char=last_end,
                         metadata={
                             **metadata,
                             "chunk_index": len(chunks),
@@ -198,11 +210,13 @@ class SemanticChunking:
                 current_chunk = [sentence]
                 current_size = sentence_len
                 current_start = start
+                last_end = end
 
             else:
                 # Add sentence to current chunk
                 current_chunk.append(sentence)
                 current_size += sentence_len
+                last_end = end
 
                 # Check if we've reached target size
                 if current_size >= self.target_size:
@@ -212,7 +226,7 @@ class SemanticChunking:
                         chunk = Chunk(
                             text=chunk_text,
                             start_char=current_start,
-                            end_char=end,
+                            end_char=last_end,
                             metadata={
                                 **metadata,
                                 "chunk_index": len(chunks),
@@ -225,7 +239,6 @@ class SemanticChunking:
                     # Start new chunk
                     current_chunk = []
                     current_size = 0
-                    current_start = end
 
         # Add final chunk if any
         if current_chunk:
@@ -234,7 +247,7 @@ class SemanticChunking:
                 chunk = Chunk(
                     text=chunk_text,
                     start_char=current_start,
-                    end_char=len(text),
+                    end_char=last_end,
                     metadata={
                         **metadata,
                         "chunk_index": len(chunks),
@@ -324,86 +337,125 @@ class RecursiveChunking:
         if metadata is None:
             metadata = {}
 
-        chunks = self._recursive_split(text, 0)
+        # Track chunk positions during recursive splitting to avoid
+        # relying on text.find, which can be incorrect when the same
+        # text appears multiple times.
+        chunks_with_positions = self._recursive_split(text, 0, 0)
 
         # Convert to Chunk objects
         result_chunks = []
-        current_pos = 0
 
-        for chunk_text in chunks:
-            start = text.find(chunk_text, current_pos)
-            if start == -1:
-                start = current_pos
-
-            end = start + len(chunk_text)
+        for chunk_text, start, end in chunks_with_positions:
+            # Align start/end with the stripped text that will be stored
+            stripped_text = chunk_text.strip()
+            leading_ws = len(chunk_text) - len(chunk_text.lstrip())
+            trailing_ws = len(chunk_text) - len(chunk_text.rstrip())
+            adjusted_start = start + leading_ws
+            adjusted_end = end - trailing_ws
 
             chunk = Chunk(
-                text=chunk_text.strip(),
-                start_char=start,
-                end_char=end,
+                text=stripped_text,
+                start_char=adjusted_start,
+                end_char=adjusted_end,
                 metadata={
                     **metadata,
                     "chunk_index": len(result_chunks),
-                    "chunk_size": len(chunk_text)
+                    "chunk_size": len(stripped_text)
                 }
             )
             result_chunks.append(chunk)
-            current_pos = end
 
         logger.debug(f"Created {len(result_chunks)} recursive chunks")
         return result_chunks
 
-    def _recursive_split(self, text: str, separator_index: int) -> List[str]:
-        """Recursively split text at different granularities."""
+    def _recursive_split(self, text: str, separator_index: int, base_offset: int) -> List[tuple]:
+        """Recursively split text at different granularities.
+
+        Returns:
+            List of (chunk_text, start_char, end_char) tuples, where
+            start_char and end_char are absolute character positions in
+            the original input text.
+        """
         if len(text) <= self.chunk_size:
-            return [text]
+            return [(text, base_offset, base_offset + len(text))]
 
         if separator_index >= len(self.separators):
             # No more separators, do hard split
-            return self._hard_split(text)
+            return self._hard_split(text, base_offset)
 
         separator = self.separators[separator_index]
         splits = text.split(separator)
 
-        chunks = []
-        current_chunk = []
+        chunks: List[tuple] = []
+        current_chunk: List[str] = []
         current_size = 0
 
+        # Track our position within `text` to compute absolute offsets
+        local_offset = 0
+        current_chunk_start_offset = base_offset
+
         for split in splits:
-            split_size = len(split) + len(separator)
+            split_len = len(split)
+            sep_len = len(separator)
+            split_size = split_len + sep_len
+
+            if not current_chunk:
+                # First piece of a new chunk starts here
+                current_chunk_start_offset = base_offset + local_offset
 
             if current_size + split_size > self.chunk_size and current_chunk:
                 # Join and add current chunk
-                chunk = separator.join(current_chunk)
-                if len(chunk) > self.chunk_size:
+                chunk_text = separator.join(current_chunk)
+                chunk_start = current_chunk_start_offset
+                chunk_end = chunk_start + len(chunk_text)
+
+                if len(chunk_text) > self.chunk_size:
                     # Chunk still too large, try next separator
-                    sub_chunks = self._recursive_split(chunk, separator_index + 1)
+                    sub_chunks = self._recursive_split(
+                        chunk_text, separator_index + 1, chunk_start
+                    )
                     chunks.extend(sub_chunks)
                 else:
-                    chunks.append(chunk)
+                    chunks.append((chunk_text, chunk_start, chunk_end))
 
+                # Start a new chunk with the current split
                 current_chunk = [split]
                 current_size = split_size
+                current_chunk_start_offset = base_offset + local_offset
             else:
                 current_chunk.append(split)
                 current_size += split_size
 
+            # Advance local_offset past this split and its separator
+            local_offset += split_len + sep_len
+
         # Add final chunk
         if current_chunk:
-            chunk = separator.join(current_chunk)
-            if len(chunk) > self.chunk_size:
-                sub_chunks = self._recursive_split(chunk, separator_index + 1)
+            chunk_text = separator.join(current_chunk)
+            chunk_start = current_chunk_start_offset
+            chunk_end = chunk_start + len(chunk_text)
+            if len(chunk_text) > self.chunk_size:
+                sub_chunks = self._recursive_split(
+                    chunk_text, separator_index + 1, chunk_start
+                )
                 chunks.extend(sub_chunks)
             else:
-                chunks.append(chunk)
+                chunks.append((chunk_text, chunk_start, chunk_end))
 
         return chunks
 
-    def _hard_split(self, text: str) -> List[str]:
-        """Split text at exact character boundaries."""
-        chunks = []
-        for i in range(0, len(text), self.chunk_size - self.overlap):
-            chunk = text[i:i + self.chunk_size]
-            if chunk.strip():
-                chunks.append(chunk)
+    def _hard_split(self, text: str, base_offset: int) -> List[tuple]:
+        """Split text at exact character boundaries.
+
+        Returns:
+            List of (chunk_text, start_char, end_char) tuples.
+        """
+        chunks: List[tuple] = []
+        step = max(1, self.chunk_size - self.overlap)
+        for i in range(0, len(text), step):
+            chunk_text = text[i:i + self.chunk_size]
+            if chunk_text.strip():
+                start = base_offset + i
+                end = start + len(chunk_text)
+                chunks.append((chunk_text, start, end))
         return chunks
