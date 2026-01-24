@@ -1,4 +1,6 @@
 // Model-related types
+import type { SamplingSettings } from './settings';
+
 export type ModelProvider = 'local' | 'openai' | 'anthropic' | 'google' | 'ollama' | 'deepseek' | 'custom';
 
 export type ModelType = 'chat' | 'completion' | 'embedding';

@@ -1,49 +1,108 @@
-import { useTheme } from '@/hooks';
+import { useState } from 'react';
+import { Sidebar } from '@/components/Sidebar';
+import { ChatInterface } from '@/components/Chat';
+import { ModelSelector } from '@/components/Models';
+import { Settings, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui';
-import { Moon, Sun } from 'lucide-react';
+import { useModels } from '@/hooks';
 
 export function HomePage() {
-  const { theme, setTheme } = useTheme();
+  const [currentChatId, setCurrentChatId] = useState<string | undefined>(undefined);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showModelSelector, setShowModelSelector] = useState(false);
+  const { currentModel } = useModels();
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+  const handleSelectChat = (chatId: string) => {
+    setCurrentChatId(chatId);
+  };
+
+  const handleNewChat = () => {
+    setCurrentChatId(undefined);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <div className="max-w-2xl w-full space-y-8 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">
-          Welcome to AI Studio
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Your intelligent assistant for creative work and problem-solving
-        </p>
-        
-        <div className="flex justify-center gap-4 pt-8">
-          <Button onClick={toggleTheme}>
-            {theme === 'dark' ? (
-              <>
-                <Sun className="w-5 h-5 mr-2" />
-                Light Mode
-              </>
-            ) : (
-              <>
-                <Moon className="w-5 h-5 mr-2" />
-                Dark Mode
-              </>
-            )}
-          </Button>
+    <div className="h-screen flex overflow-hidden bg-gray-900 text-gray-100">
+      {/* Sidebar */}
+      {!sidebarCollapsed && (
+        <Sidebar
+          currentChatId={currentChatId}
+          onSelectChat={handleSelectChat}
+          onNewChat={handleNewChat}
+        />
+      )}
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-gray-700">
+          {/* Left side - Menu toggle and model selector */}
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              title={sidebarCollapsed ? 'Show sidebar' : 'Hide sidebar'}
+            >
+              {sidebarCollapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
+            </Button>
+
+            {/* Compact Model Selector */}
+            <ModelSelector compact />
+          </div>
+
+          {/* Right side - Settings */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowModelSelector(!showModelSelector)}
+              title="Model settings"
+            >
+              <Settings className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
 
-        <div className="pt-12 space-y-2">
-          <p className="text-sm text-muted-foreground">
-            Powered by Vite + React + TypeScript
-          </p>
-          <div className="flex justify-center gap-4 text-xs text-muted-foreground">
-            <span>✓ TailwindCSS</span>
-            <span>✓ React Router</span>
-            <span>✓ Monaco Editor</span>
-            <span>✓ React Markdown</span>
+        {/* Chat Interface or Model Selector */}
+        <div className="flex-1 overflow-hidden">
+          {showModelSelector ? (
+            <div className="h-full overflow-y-auto p-6">
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold">Model Selection</h2>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowModelSelector(false)}
+                  >
+                    Back to Chat
+                  </Button>
+                </div>
+                <ModelSelector />
+              </div>
+            </div>
+          ) : (
+            <ChatInterface
+              chatId={currentChatId}
+              modelId={currentModel?.id}
+            />
+          )}
+        </div>
+
+        {/* Status Bar */}
+        <div className="px-4 py-2 bg-gray-800 border-t border-gray-700 text-xs text-gray-400">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <span>AI Studio v0.1.0</span>
+              {currentModel && (
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                  {currentModel.name}
+                </span>
+              )}
+            </div>
+            <div>
+              Ready
+            </div>
           </div>
         </div>
       </div>
