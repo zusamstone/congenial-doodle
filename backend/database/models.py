@@ -3,7 +3,6 @@ SQLAlchemy database models
 Defines all database tables for AI Studio
 """
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import (
     Boolean,

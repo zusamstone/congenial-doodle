@@ -228,7 +228,7 @@ async def websocket_chat(websocket: WebSocket):
     try:
         while True:
             # Receive message from client
-            data = await websocket.receive_json()
+            await websocket.receive_json()
             
             # TODO: Validate data
             # TODO: Load model

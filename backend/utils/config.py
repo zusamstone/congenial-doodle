@@ -2,9 +2,7 @@
 Configuration management
 Loads settings from environment variables and config files
 """
-import os
 from pathlib import Path
-from typing import Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from loguru import logger
@@ -106,14 +104,9 @@ def save_config(config: dict, config_path: Optional[Path] = None) -> None:
     Save configuration to file
     TODO: Implement config file saving
     """
-    if config_path is None:
-        config_path = Path("./config/settings.json")
-    
     # TODO: Validate config
     # TODO: Write to file
     # TODO: Create backup
-    
-    pass
 
 
 # Configure logging

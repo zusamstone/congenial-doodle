@@ -2,9 +2,7 @@
 Portable paths management
 Handles path resolution for portable application
 """
-import os
 from pathlib import Path
-from typing import Optional
 
 from loguru import logger
 

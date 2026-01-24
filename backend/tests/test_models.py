@@ -3,7 +3,6 @@ Tests for inference engine and model management.
 """
 
 import pytest
-from pathlib import Path
 from backend.models.inference_engine import InferenceConfig, SamplingParams
 from backend.models.model_manager import ModelManager
 from backend.models.api_providers import APIProviderConfig

@@ -2,7 +2,6 @@
 AI Studio - FastAPI Backend
 Main application entry point
 """
-import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 

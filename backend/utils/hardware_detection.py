@@ -158,7 +158,7 @@ def has_cuda() -> bool:
         device_count = pynvml.nvmlDeviceGetCount()
         pynvml.nvmlShutdown()
         return device_count > 0
-    except:
+    except Exception:
         pass
     
     return False
