@@ -62,17 +62,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       )}
 
       {/* Loading State */}
-      {isLoading && !currentChat && (
+      {isLoading && chatId && !currentChat ? (
         <div className="flex items-center justify-center h-full">
           <div className="flex flex-col items-center gap-3 text-gray-400">
             <Loader2 className="w-8 h-8 animate-spin" />
             <p>Loading chat...</p>
           </div>
         </div>
-      )}
-
-      {/* Messages Area */}
-      {!isLoading && (
+      ) : (
+        /* Messages Area */
         <div className="flex-1 overflow-hidden">
           <MessageList
             messages={messages}

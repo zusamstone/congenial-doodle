@@ -75,15 +75,23 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       <div className="max-w-4xl mx-auto">
         <div className="relative flex items-end gap-2">
           {/* Optional attachment button (for future file upload) */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="mb-2 text-gray-400 hover:text-gray-300"
-            disabled={disabled || isLoading || isStreaming}
-            title="Attach file (coming soon)"
-          >
-            <Paperclip className="w-5 h-5" />
-          </Button>
+          <div className="relative mb-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-400 hover:text-gray-300 opacity-60 cursor-not-allowed"
+              disabled={disabled || isLoading || isStreaming}
+              title="Attach file (coming soon)"
+              aria-label="Attach file (coming soon)"
+            >
+              <div className="flex flex-col items-center gap-0.5">
+                <Paperclip className="w-5 h-5" />
+                <span className="text-[10px] uppercase tracking-wide text-amber-400">
+                  Soon
+                </span>
+              </div>
+            </Button>
+          </div>
 
           {/* Text input area */}
           <div className="flex-1 relative">
@@ -121,15 +129,23 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           </div>
 
           {/* Optional voice input button (for future feature) */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="mb-2 text-gray-400 hover:text-gray-300"
-            disabled={disabled || isLoading || isStreaming}
-            title="Voice input (coming soon)"
-          >
-            <Mic className="w-5 h-5" />
-          </Button>
+          <div className="relative mb-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-400 hover:text-gray-300 opacity-60 cursor-not-allowed"
+              disabled={disabled || isLoading || isStreaming}
+              title="Voice input (coming soon)"
+              aria-label="Voice input (coming soon)"
+            >
+              <div className="flex flex-col items-center gap-0.5">
+                <Mic className="w-5 h-5" />
+                <span className="text-[10px] uppercase tracking-wide text-amber-400">
+                  Soon
+                </span>
+              </div>
+            </Button>
+          </div>
 
           {/* Send/Stop button */}
           {isStreaming ? (

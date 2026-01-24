@@ -1,6 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Pin, Copy, Trash2, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
+import remarkGfm from 'remark-gfm';
+import rehypeSanitize from 'rehype-sanitize';
+import { Pin, Copy, Trash2, RotateCcw, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import type { Message } from '@/types/chat';
 import { Button } from '@/components/ui';
 import { cn } from '@/utils/helpers';
@@ -15,20 +17,41 @@ interface MessageListProps {
 
 export const MessageList: React.FC<MessageListProps> = ({
   messages,
+  isStreaming,
   onDeleteMessage,
   onPinMessage,
   onRegenerateMessage,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const prevMessageCountRef = useRef<number>(0);
   const [expandedThinking, setExpandedThinking] = React.useState<Set<string>>(new Set());
+  const [copiedId, setCopiedId] = React.useState<string | null>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive or while streaming
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const prevCount = prevMessageCountRef.current;
+    const currentCount = messages.length;
+    const hasNewMessage = currentCount > prevCount;
 
-  const copyToClipboard = (content: string) => {
-    navigator.clipboard.writeText(content);
+    if (!hasNewMessage && !isStreaming) {
+      prevMessageCountRef.current = currentCount;
+      return;
+    }
+
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    prevMessageCountRef.current = currentCount;
+  }, [messages, isStreaming]);
+
+  const copyToClipboard = (content: string, messageId: string) => {
+    navigator.clipboard
+      .writeText(content)
+      .then(() => {
+        setCopiedId(messageId);
+        setTimeout(() => setCopiedId(null), 2000);
+      })
+      .catch((error) => {
+        console.error('Failed to copy to clipboard:', error);
+      });
   };
 
   const toggleThinking = (messageId: string) => {
@@ -114,10 +137,14 @@ export const MessageList: React.FC<MessageListProps> = ({
             {message.role === 'assistant' ? (
               <div className="prose prose-invert max-w-none">
                 <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeSanitize]}
                   components={{
                     code({ className, children, ...props }) {
                       const match = /language-(\w+)/.exec(className || '');
                       const inline = !match;
+                      const codeContent = String(children);
+                      const codeId = `code-${message.id}-${codeContent.substring(0, 10)}`;
                       return inline ? (
                         <code className="bg-gray-900 px-1 py-0.5 rounded text-sm" {...props}>
                           {children}
@@ -125,10 +152,15 @@ export const MessageList: React.FC<MessageListProps> = ({
                       ) : (
                         <div className="relative group">
                           <button
-                            onClick={() => copyToClipboard(String(children))}
-                            className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => copyToClipboard(codeContent, codeId)}
+                            className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 hover:bg-gray-600 p-1.5 rounded"
+                            title={copiedId === codeId ? 'Copied!' : 'Copy code'}
                           >
-                            <Copy className="w-4 h-4" />
+                            {copiedId === codeId ? (
+                              <Check className="w-4 h-4 text-green-400" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
                           </button>
                           <code className={className} {...props}>
                             {children}
@@ -165,15 +197,23 @@ export const MessageList: React.FC<MessageListProps> = ({
           </div>
 
           {/* Message Actions */}
-          {message.status === 'sent' && (
+          {message.status !== 'streaming' && message.status !== 'sending' && (
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => copyToClipboard(message.content)}
-                className="text-gray-400 hover:text-gray-300"
+                onClick={() => copyToClipboard(message.content, message.id)}
+                className={cn(
+                  'text-gray-400 hover:text-gray-300',
+                  copiedId === message.id && 'text-green-400'
+                )}
+                title={copiedId === message.id ? 'Copied!' : 'Copy message'}
               >
-                <Copy className="w-4 h-4" />
+                {copiedId === message.id ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </Button>
               {onPinMessage && (
                 <Button
