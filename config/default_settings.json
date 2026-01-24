@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AI Studio Default Settings",
+  "description": "Default configuration for AI Studio application",
+  "type": "object",
+  "userMode": "general",
+  "theme": "dark",
+  "contextStrategy": "smart_summarization",
+  "contextThreshold": 0.75,
+  "defaultModel": null,
+  "sampling": {
+    "temperature": 0.7,
+    "maxTokens": 2048,
+    "topP": 0.9,
+    "topK": 40,
+    "repeatPenalty": 1.1,
+    "frequencyPenalty": 0.0,
+    "presencePenalty": 0.0,
+    "seed": null,
+    "stopSequences": []
+  },
+  "advanced": {
+    "mirostat": 0,
+    "mirostatTau": 5.0,
+    "mirostatEta": 0.1,
+    "tfs": 1.0,
+    "minP": 0.05,
+    "typicalP": 1.0,
+    "repeatPenaltyRange": 256,
+    "penaltyAlpha": 0.0
+  },
+  "modelLoading": {
+    "gpuLayers": -1,
+    "threads": null,
+    "batchSize": 512,
+    "contextSize": null,
+    "ropeScaling": null
+  },
+  "rag": {
+    "enabled": true,
+    "maxChunks": 5,
+    "minRelevance": 0.7,
+    "embeddingModel": "all-MiniLM-L6-v2",
+    "retrievalMethod": "similarity",
+    "reranking": false,
+    "chunkSize": 512,
+    "chunkOverlap": 128,
+    "indexChatHistory": false
+  },
+  "guidance": {
+    "enabled": false,
+    "method": "system_prompt",
+    "strength": 0.3,
+    "positive": [],
+    "negative": []
+  },
+  "thinkingModels": {
+    "enabled": true,
+    "autoDetect": true,
+    "defaultCollapsed": false,
+    "excludeFromContext": true,
+    "customDelimiters": {
+      "start": "<thinking>",
+      "end": "</thinking>"
+    }
+  },
+  "chat": {
+    "streamingEnabled": true,
+    "autoSave": true,
+    "autoTitle": true,
+    "maxHistoryLength": 1000,
+    "defaultSystemPrompt": null
+  },
+  "ui": {
+    "sidebarCollapsed": false,
+    "messageTimestamps": true,
+    "showTokenCounts": true,
+    "showResourceMonitor": true,
+    "codeHighlighting": true,
+    "syntaxTheme": "github-dark",
+    "fontSize": "medium",
+    "messageSpacing": "comfortable"
+  },
+  "privacy": {
+    "telemetryEnabled": false,
+    "crashReporting": false,
+    "localOnly": true
+  },
+  "performance": {
+    "lazyLoadModels": true,
+    "autoUnloadUnused": true,
+    "maxLoadedModels": 3,
+    "batchEmbeddings": true
+  },
+  "export": {
+    "includeSystemPrompt": true,
+    "includeMetadata": true,
+    "includeThinking": true,
+    "includeTimestamps": false,
+    "defaultFormat": "markdown"
+  },
+  "updates": {
+    "checkForUpdates": true,
+    "autoDownload": false,
+    "notifyOnly": true
+  },
+  "storage": {
+    "dataDirectory": "./data",
+    "maxDiskUsage": null,
+    "autoCleanup": false,
+    "retentionDays": null
+  },
+  "keyboardShortcuts": {
+    "enabled": true,
+    "customShortcuts": {}
+  },
+  "experimental": {
+    "multimodalSupport": false,
+    "voiceInput": false,
+    "conversationBranching": false
+  }
+}
