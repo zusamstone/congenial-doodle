@@ -1,0 +1,464 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Guidance Presets",
+  "description": "Pre-configured guidance settings for different use cases",
+  "presets": [
+    {
+      "id": "code-assistant",
+      "name": "Code Assistant",
+      "description": "Optimized for coding tasks with emphasis on best practices and examples",
+      "method": "system_prompt",
+      "strength": 0.4,
+      "categories": {
+        "style": {
+          "positive": ["concise", "technical", "precise"],
+          "negative": ["verbose", "ambiguous", "vague"]
+        },
+        "content": {
+          "positive": [
+            "code examples",
+            "best practices",
+            "error handling",
+            "type safety",
+            "documentation",
+            "test cases",
+            "performance considerations",
+            "security practices"
+          ],
+          "negative": [
+            "incomplete code",
+            "deprecated methods",
+            "hardcoded values",
+            "missing edge cases",
+            "poor naming",
+            "code without explanation"
+          ]
+        },
+        "format": {
+          "positive": [
+            "code blocks with language",
+            "inline comments",
+            "markdown formatting",
+            "structured explanations"
+          ],
+          "negative": [
+            "unformatted code",
+            "missing syntax highlighting"
+          ]
+        },
+        "length": {
+          "positive": ["comprehensive but focused"],
+          "negative": ["overly brief", "excessive boilerplate"]
+        }
+      }
+    },
+    {
+      "id": "creative-writer",
+      "name": "Creative Writer",
+      "description": "Encourages vivid, engaging creative writing",
+      "method": "system_prompt",
+      "strength": 0.5,
+      "categories": {
+        "style": {
+          "positive": [
+            "vivid descriptions",
+            "varied sentence structure",
+            "engaging tone",
+            "evocative language"
+          ],
+          "negative": [
+            "clichés",
+            "passive voice",
+            "repetitive phrasing",
+            "telling instead of showing"
+          ]
+        },
+        "content": {
+          "positive": [
+            "sensory details",
+            "dialogue",
+            "character development",
+            "emotional depth",
+            "conflict",
+            "imagery",
+            "metaphors"
+          ],
+          "negative": [
+            "generic descriptions",
+            "flat characters",
+            "info dumps",
+            "deus ex machina"
+          ]
+        },
+        "format": {
+          "positive": [
+            "proper paragraphing",
+            "dialogue formatting",
+            "scene breaks"
+          ],
+          "negative": ["walls of text"]
+        },
+        "length": {
+          "positive": ["rich and detailed"],
+          "negative": ["rushed", "overly sparse"]
+        }
+      }
+    },
+    {
+      "id": "data-analyst",
+      "name": "Data Analyst",
+      "description": "Focus on data-driven insights and quantitative analysis",
+      "method": "system_prompt",
+      "strength": 0.4,
+      "categories": {
+        "style": {
+          "positive": ["analytical", "objective", "data-driven"],
+          "negative": ["subjective opinions", "speculation without data"]
+        },
+        "content": {
+          "positive": [
+            "statistics",
+            "charts and graphs suggestions",
+            "data patterns",
+            "quantitative insights",
+            "metrics",
+            "trends",
+            "correlations",
+            "actionable recommendations"
+          ],
+          "negative": [
+            "anecdotal evidence",
+            "unsupported claims",
+            "ignoring outliers",
+            "cherry-picking data"
+          ]
+        },
+        "format": {
+          "positive": [
+            "tables",
+            "bullet points for key findings",
+            "visualizations",
+            "structured analysis"
+          ],
+          "negative": ["narrative without data", "missing context"]
+        },
+        "length": {
+          "positive": ["comprehensive analysis"],
+          "negative": ["superficial overview"]
+        }
+      }
+    },
+    {
+      "id": "academic-writing",
+      "name": "Academic Writing",
+      "description": "Formal scholarly writing with citations and rigorous argumentation",
+      "method": "system_prompt",
+      "strength": 0.5,
+      "categories": {
+        "style": {
+          "positive": [
+            "formal academic tone",
+            "precise language",
+            "objective voice",
+            "scholarly"
+          ],
+          "negative": [
+            "casual language",
+            "colloquialisms",
+            "first-person narrative",
+            "emotional appeals"
+          ]
+        },
+        "content": {
+          "positive": [
+            "citations",
+            "evidence-based arguments",
+            "literature review",
+            "methodology",
+            "counterarguments",
+            "theoretical framework",
+            "critical analysis"
+          ],
+          "negative": [
+            "unsupported claims",
+            "plagiarism",
+            "weak sources",
+            "logical fallacies",
+            "bias without acknowledgment"
+          ]
+        },
+        "format": {
+          "positive": [
+            "structured sections",
+            "proper citations",
+            "academic formatting",
+            "clear thesis"
+          ],
+          "negative": ["poor organization", "missing references"]
+        },
+        "length": {
+          "positive": ["thorough and detailed"],
+          "negative": ["superficial treatment"]
+        }
+      }
+    },
+    {
+      "id": "business-communication",
+      "name": "Business Communication",
+      "description": "Professional business writing with clear action items",
+      "method": "system_prompt",
+      "strength": 0.3,
+      "categories": {
+        "style": {
+          "positive": [
+            "professional",
+            "clear",
+            "concise",
+            "action-oriented"
+          ],
+          "negative": [
+            "overly casual",
+            "verbose",
+            "ambiguous",
+            "passive"
+          ]
+        },
+        "content": {
+          "positive": [
+            "clear action items",
+            "deadlines",
+            "responsibilities",
+            "business value",
+            "ROI",
+            "stakeholder impact",
+            "next steps"
+          ],
+          "negative": [
+            "jargon overload",
+            "unclear expectations",
+            "missing context",
+            "vague timelines"
+          ]
+        },
+        "format": {
+          "positive": [
+            "bullet points",
+            "executive summary",
+            "clear headers",
+            "structured layout"
+          ],
+          "negative": ["dense paragraphs", "poor organization"]
+        },
+        "length": {
+          "positive": ["concise but complete"],
+          "negative": ["excessive detail", "too brief"]
+        }
+      }
+    },
+    {
+      "id": "technical-documentation",
+      "name": "Technical Documentation",
+      "description": "Clear, structured technical documentation",
+      "method": "system_prompt",
+      "strength": 0.4,
+      "categories": {
+        "style": {
+          "positive": ["clear", "precise", "instructional", "unambiguous"],
+          "negative": ["vague", "assuming knowledge", "unclear"]
+        },
+        "content": {
+          "positive": [
+            "step-by-step instructions",
+            "prerequisites",
+            "examples",
+            "troubleshooting",
+            "screenshots/diagrams suggestions",
+            "configuration details",
+            "error messages",
+            "FAQs"
+          ],
+          "negative": [
+            "missing steps",
+            "incorrect information",
+            "outdated references",
+            "unexplained jargon"
+          ]
+        },
+        "format": {
+          "positive": [
+            "numbered steps",
+            "code blocks",
+            "tables",
+            "clear sections",
+            "table of contents"
+          ],
+          "negative": ["poor formatting", "missing code examples"]
+        },
+        "length": {
+          "positive": ["comprehensive"],
+          "negative": ["incomplete", "overly verbose"]
+        }
+      }
+    },
+    {
+      "id": "debugging-mode",
+      "name": "Debugging Mode",
+      "description": "Systematic debugging with detailed analysis",
+      "method": "system_prompt",
+      "strength": 0.3,
+      "categories": {
+        "style": {
+          "positive": ["systematic", "analytical", "methodical"],
+          "negative": ["guessing", "jumping to conclusions"]
+        },
+        "content": {
+          "positive": [
+            "error analysis",
+            "stack traces",
+            "debugging steps",
+            "logging suggestions",
+            "breakpoint recommendations",
+            "root cause analysis",
+            "verification steps"
+          ],
+          "negative": [
+            "superficial fixes",
+            "ignoring error messages",
+            "untested solutions"
+          ]
+        },
+        "format": {
+          "positive": [
+            "diagnostic checklist",
+            "step-by-step debugging",
+            "before/after code"
+          ],
+          "negative": ["vague suggestions"]
+        },
+        "length": {
+          "positive": ["thorough investigation"],
+          "negative": ["quick fixes without explanation"]
+        }
+      }
+    },
+    {
+      "id": "teaching-mode",
+      "name": "Teaching Mode",
+      "description": "Educational explanations with examples and analogies",
+      "method": "system_prompt",
+      "strength": 0.4,
+      "categories": {
+        "style": {
+          "positive": [
+            "patient",
+            "encouraging",
+            "clear",
+            "accessible"
+          ],
+          "negative": [
+            "condescending",
+            "overly technical",
+            "discouraging"
+          ]
+        },
+        "content": {
+          "positive": [
+            "examples",
+            "analogies",
+            "step-by-step breakdowns",
+            "practice problems",
+            "common mistakes",
+            "visual aids suggestions",
+            "progressive difficulty"
+          ],
+          "negative": [
+            "jargon without explanation",
+            "skipping fundamentals",
+            "overwhelming detail"
+          ]
+        },
+        "format": {
+          "positive": [
+            "clear sections",
+            "highlighted key points",
+            "summaries",
+            "review questions"
+          ],
+          "negative": ["information overload"]
+        },
+        "length": {
+          "positive": ["appropriately detailed"],
+          "negative": ["too brief", "overwhelming"]
+        }
+      }
+    },
+    {
+      "id": "review-mode",
+      "name": "Review Mode",
+      "description": "Constructive review and feedback",
+      "method": "system_prompt",
+      "strength": 0.3,
+      "categories": {
+        "style": {
+          "positive": ["constructive", "specific", "balanced"],
+          "negative": ["overly critical", "vague", "only negative"]
+        },
+        "content": {
+          "positive": [
+            "specific improvements",
+            "positive aspects",
+            "actionable feedback",
+            "prioritized issues",
+            "examples of better approaches"
+          ],
+          "negative": [
+            "vague criticism",
+            "nitpicking",
+            "subjective preferences without explanation"
+          ]
+        },
+        "format": {
+          "positive": [
+            "organized by priority",
+            "before/after suggestions",
+            "clear categories"
+          ],
+          "negative": ["unorganized feedback"]
+        },
+        "length": {
+          "positive": ["thorough but focused"],
+          "negative": ["superficial", "excessive detail on minor issues"]
+        }
+      }
+    },
+    {
+      "id": "minimal-mode",
+      "name": "Minimal Mode",
+      "description": "Concise, to-the-point responses",
+      "method": "system_prompt",
+      "strength": 0.5,
+      "categories": {
+        "style": {
+          "positive": ["concise", "direct", "efficient"],
+          "negative": ["verbose", "rambling", "repetitive"]
+        },
+        "content": {
+          "positive": ["essential information", "key points", "core answer"],
+          "negative": [
+            "unnecessary elaboration",
+            "tangential information",
+            "excessive examples"
+          ]
+        },
+        "format": {
+          "positive": ["bullet points", "brief paragraphs"],
+          "negative": ["long narratives"]
+        },
+        "length": {
+          "positive": ["brief and complete"],
+          "negative": ["excessive detail"]
+        }
+      }
+    }
+  ]
+}
