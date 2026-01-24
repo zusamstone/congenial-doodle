@@ -16,6 +16,21 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   const { models, currentModel, isLoading, loadModel, unloadModel, setCurrentModel } = useModels();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<ModelProvider | 'all'>('all');
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  // Handle Escape key to close dropdown
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isOpen]);
 
   // Group models by provider
   const providers: ModelProvider[] = Array.from(
@@ -29,15 +44,20 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       : models.filter((m) => m.provider === selectedProvider);
 
   const handleSelectModel = async (model: Model) => {
-    if (!model.loaded) {
-      await loadModel(model.id);
-    }
+    try {
+      if (!model.loaded) {
+        await loadModel(model.id);
+      }
 
-    setCurrentModel(model.id);
-    if (onModelChange) {
-      onModelChange(model);
+      setCurrentModel(model.id);
+      if (onModelChange) {
+        onModelChange(model);
+      }
+      setIsOpen(false);
+    } catch (err) {
+      // Error is handled by loadModel hook, just don't set current model
+      console.error('Failed to load model:', err);
     }
-    setIsOpen(false);
   };
 
   const handleUnloadModel = async (modelId: string, e: React.MouseEvent) => {
@@ -73,10 +93,13 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
   if (compact) {
     return (
-      <div className="relative">
+      <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors text-sm"
+          aria-label="Select model"
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
         >
           {currentModel ? (
             <>
@@ -91,8 +114,16 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
         {isOpen && (
           <>
-            <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-            <div className="absolute top-full left-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20 max-h-96 overflow-y-auto">
+            <div 
+              className="fixed inset-0 z-10" 
+              onClick={() => setIsOpen(false)}
+              aria-hidden="true"
+            />
+            <div 
+              className="absolute top-full left-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20 max-h-96 overflow-y-auto"
+              role="listbox"
+              aria-label="Available models"
+            >
               <ModelList
                 models={filteredModels}
                 currentModel={currentModel}

@@ -36,13 +36,14 @@ export const useChat = (options: UseChatOptions = {}): UseChatReturn => {
 
   const wsRef = useRef<WebSocket | null>(null);
   const streamingMessageRef = useRef<Message | null>(null);
+  const pendingMessageRef = useRef<string | null>(null);
 
   // Load chat messages when chatId changes
   useEffect(() => {
     if (options.chatId) {
       loadChat(options.chatId);
     }
-  }, [options.chatId]);
+  }, [options.chatId, loadChat]);
 
   // Cleanup WebSocket on unmount
   useEffect(() => {
@@ -86,6 +87,16 @@ export const useChat = (options: UseChatOptions = {}): UseChatReturn => {
 
       setCurrentChat(newChat);
       setMessages([]);
+      
+      // If there's a pending message, send it now
+      if (pendingMessageRef.current) {
+        const pendingMessage = pendingMessageRef.current;
+        pendingMessageRef.current = null;
+        // Use setTimeout to ensure state is updated
+        setTimeout(() => {
+          sendMessageInternal(pendingMessage, newChat);
+        }, 0);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create chat';
       setError(errorMessage);
@@ -94,20 +105,15 @@ export const useChat = (options: UseChatOptions = {}): UseChatReturn => {
     }
   }, [options.modelId, options.systemPromptId]);
 
-  const sendMessage = useCallback(async (content: string) => {
-    if (!currentChat) {
-      await createNewChat();
-      // Chat creation will trigger a re-render, send message after that
-      return;
-    }
-
+  // Internal function to send a message (used by both sendMessage and createNewChat)
+  const sendMessageInternal = useCallback(async (content: string, chat: Chat) => {
     setError(null);
     setIsStreaming(true);
 
     // Create user message
     const userMessage: Message = {
       id: `temp-${Date.now()}`,
-      chatId: currentChat.id,
+      chatId: chat.id,
       role: 'user',
       content,
       createdAt: new Date(),
@@ -120,7 +126,7 @@ export const useChat = (options: UseChatOptions = {}): UseChatReturn => {
     // Initialize streaming assistant message
     const assistantMessage: Message = {
       id: `temp-streaming-${Date.now()}`,
-      chatId: currentChat.id,
+      chatId: chat.id,
       role: 'assistant',
       content: '',
       createdAt: new Date(),
@@ -133,14 +139,17 @@ export const useChat = (options: UseChatOptions = {}): UseChatReturn => {
 
     try {
       // Connect to WebSocket for streaming
-      const wsUrl = `ws://localhost:8000/api/chat/ws`;
+      const wsUrl =
+        typeof window !== 'undefined'
+          ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/chat/ws`
+          : `ws://localhost:8000/api/chat/ws`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
         ws.send(
           JSON.stringify({
-            chatId: currentChat.id,
+            chatId: chat.id,
             message: content,
             modelId: options.modelId,
             systemPromptId: options.systemPromptId,
@@ -202,7 +211,24 @@ export const useChat = (options: UseChatOptions = {}): UseChatReturn => {
       setError(errorMessage);
       setIsStreaming(false);
     }
-  }, [currentChat, options.modelId, options.systemPromptId]);
+  }, [options.modelId, options.systemPromptId]);
+
+  const sendMessage = useCallback(async (content: string) => {
+    if (!currentChat) {
+      // Store pending message and create chat
+      pendingMessageRef.current = content;
+      await createNewChat();
+      return;
+    }
+
+    // Prevent sending new messages while streaming
+    if (isStreaming) {
+      console.warn('Cannot send message while streaming');
+      return;
+    }
+
+    sendMessageInternal(content, currentChat);
+  }, [currentChat, isStreaming, createNewChat, sendMessageInternal]);
 
   const regenerateMessage = useCallback(async (messageId: string) => {
     if (!currentChat) return;
