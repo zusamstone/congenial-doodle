@@ -199,7 +199,7 @@ export interface SearchResult {
   content: string;
   relevance: number;
   highlights?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface SearchResults {
@@ -218,7 +218,7 @@ export interface AppError {
   details?: string;
   stack?: string;
   timestamp: Date;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   recoverable: boolean;
   suggestion?: string;
 }
@@ -226,7 +226,7 @@ export interface AppError {
 export interface ApiError {
   message: string;
   code?: string;
-  details?: any;
+  details?: unknown;
 }
 
 export type ErrorCode =

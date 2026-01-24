@@ -28,22 +28,24 @@ export const useModels = (): UseModelsReturn => {
       setModels(fetchedModels);
 
       // Set current model to first loaded model if none is selected
-      if (!currentModel && fetchedModels.length > 0) {
-        const loadedModel = fetchedModels.find((m) => m.loaded);
-        if (loadedModel) {
-          setCurrentModelState(loadedModel);
+      setCurrentModelState((prevCurrentModel) => {
+        if (!prevCurrentModel && fetchedModels.length > 0) {
+          const loadedModel = fetchedModels.find((m) => m.loaded);
+          return loadedModel || null;
         }
-      }
+        return prevCurrentModel;
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load models';
       setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  }, [currentModel]);
+  }, []);
 
   useEffect(() => {
     fetchModels();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadModel = useCallback(async (modelId: string, options?: ModelLoadOptions) => {
@@ -76,21 +78,23 @@ export const useModels = (): UseModelsReturn => {
     try {
       await api.post(`/models/${modelId}/unload`);
 
-      // Update model status
-      setModels((prev) =>
-        prev.map((m) => (m.id === modelId ? { ...m, loaded: false } : m))
-      );
-
-      // Clear current model if it was unloaded
-      if (currentModel?.id === modelId) {
-        const otherLoadedModel = models.find((m) => m.loaded && m.id !== modelId);
-        setCurrentModelState(otherLoadedModel || null);
-      }
+      // Update model status and clear current model if it was unloaded
+      setModels((prev) => {
+        const updated = prev.map((m) => (m.id === modelId ? { ...m, loaded: false } : m));
+        
+        // If current model was unloaded, find another loaded model
+        if (currentModel?.id === modelId) {
+          const otherLoadedModel = updated.find((m) => m.loaded && m.id !== modelId);
+          setCurrentModelState(otherLoadedModel || null);
+        }
+        
+        return updated;
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to unload model';
       setError(errorMessage);
     }
-  }, [currentModel, models]);
+  }, [currentModel]);
 
   const setCurrentModel = useCallback((modelId: string) => {
     const model = models.find((m) => m.id === modelId);

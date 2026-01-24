@@ -31,7 +31,7 @@ export interface SourceMetadata {
   language?: string;
   createdDate?: Date;
   modifiedDate?: Date;
-  customFields?: Record<string, any>;
+  customFields?: Record<string, unknown>;
 }
 
 export interface DocumentChunk {
@@ -50,7 +50,7 @@ export interface ChunkMetadata {
   startChar?: number;
   endChar?: number;
   heading?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface DocumentUploadOptions {
@@ -93,7 +93,7 @@ export interface RAGRetrievalOptions {
 export interface RAGFilter {
   field: string;
   operator: 'equals' | 'contains' | 'in' | 'range';
-  value: any;
+  value: string | number | boolean | string[] | number[];
 }
 
 export interface RAGRetrievalResult {

@@ -34,7 +34,8 @@ export const useChatList = (): UseChatListReturn => {
 
   useEffect(() => {
     loadChats();
-  }, [loadChats]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const createChat = useCallback(async (title?: string): Promise<Chat | null> => {
     setError(null);

@@ -93,7 +93,7 @@ export interface LoRA {
   description?: string;
   author?: string;
   tags?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: Date;
 }
 
