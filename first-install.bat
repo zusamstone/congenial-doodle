@@ -9,10 +9,10 @@ echo This script will set up all dependencies for AI Studio.
 echo.
 
 :: Store current directory
-set "ROOT_DIR=%cd%"
+set "ROOT_DIR=%~dp0"
 
 :: Check prerequisites
-echo [1/7] Checking prerequisites...
+echo [1/6] Checking prerequisites...
 echo.
 
 :: Check Python
@@ -52,12 +52,12 @@ npm --version
 echo.
 
 :: Upgrade pip
-echo [2/7] Upgrading pip...
+echo [2/6] Upgrading pip...
 python -m pip install --upgrade pip
 echo.
 
 :: Install Python dependencies
-echo [3/7] Installing Python dependencies...
+echo [3/6] Installing Python dependencies...
 cd backend
 python -m pip install -r requirements.txt
 if errorlevel 1 (
@@ -71,7 +71,7 @@ cd "%ROOT_DIR%"
 echo.
 
 :: Create .env file if it doesn't exist
-echo [4/7] Setting up environment configuration...
+echo [4/6] Setting up environment configuration...
 cd backend
 if not exist ".env" (
     if exist ".env.example" (
@@ -79,7 +79,7 @@ if not exist ".env" (
         echo       Created .env file from template.
         echo       [IMPORTANT] Please edit backend\.env to configure your settings.
     ) else (
-        echo       [WARNING] No .env.example found.
+        echo       [WARNING] No .env.example found. The application will use default settings. You can create a backend\.env file later to customize configuration.
     )
 ) else (
     echo       .env file already exists.
@@ -87,21 +87,8 @@ if not exist ".env" (
 cd "%ROOT_DIR%"
 echo.
 
-:: Create data directories
-echo [5/7] Creating data directories...
-cd backend
-if not exist "data" mkdir data
-if not exist "data\models" mkdir data\models
-if not exist "data\vector_store" mkdir data\vector_store
-if not exist "data\database" mkdir data\database
-if not exist "data\uploads" mkdir data\uploads
-if not exist "data\logs" mkdir data\logs
-echo       Data directories created.
-cd "%ROOT_DIR%"
-echo.
-
 :: Install root Node.js dependencies
-echo [6/7] Installing Node.js dependencies (this may take a while)...
+echo [5/6] Installing Node.js dependencies (this may take a while)...
 call npm install
 if errorlevel 1 (
     echo [ERROR] Failed to install root dependencies.
@@ -111,7 +98,7 @@ if errorlevel 1 (
 echo.
 
 :: Install workspace dependencies
-echo [7/7] Installing workspace dependencies...
+echo [6/6] Installing workspace dependencies...
 
 cd frontend
 call npm install

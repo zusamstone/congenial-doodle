@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 title AI Studio - Start
 color 0A
 echo ============================================================
@@ -46,9 +47,11 @@ if errorlevel 1 (
     if "%choice%"=="1" (
         cd ..
         call update.bat
+        exit /b 0
     ) else if "%choice%"=="2" (
         cd ..
         call first-install.bat
+        exit /b 0
     ) else (
         echo Exiting...
         cd ..

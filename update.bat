@@ -7,19 +7,11 @@ echo ============================================================
 echo.
 
 :: Store current directory
-set "ROOT_DIR=%cd%"
+set "ROOT_DIR=%~dp0"
 
 :: Check Python version
 echo [1/5] Checking Python version...
-python --version 2>&1 | findstr /R "3\.1[1-9]\." >nul
-if errorlevel 1 (
-    python --version 2>&1 | findstr /R "3\.[2-9][0-9]\." >nul
-    if errorlevel 1 (
-        echo [WARNING] Python 3.11+ is recommended. Current version:
-        python --version
-        echo.
-    )
-)
+python --version
 echo       Python check complete.
 echo.
 
@@ -44,8 +36,8 @@ echo       Python dependencies updated.
 cd "%ROOT_DIR%"
 echo.
 
-:: Update Node.js dependencies (root workspace)
-echo [4/5] Updating Node.js dependencies...
+:: Install/verify Node.js dependencies (root workspace)
+echo [4/5] Installing Node.js dependencies...
 call npm install
 if errorlevel 1 (
     echo [ERROR] Failed to update root Node.js dependencies.
